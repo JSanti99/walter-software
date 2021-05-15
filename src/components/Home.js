@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-
 // utils
 import img1 from "../utils/img/1.jpg";
 import img2 from "../utils/img/2.jpg";
@@ -10,78 +7,13 @@ import img5 from "../utils/img/5.jpg";
 import img6 from "../utils/img/6.jpg";
 import img7 from "../utils/img/7.jpg";
 import banner from "../utils/img/banner.jpg";
-import logo from "../utils/img/logo.jpg";
 import icono1 from "../utils/img/icono1.png";
 import icono2 from "../utils/img/icono2.png";
 import icono3 from "../utils/img/icono3.png";
-import { getUser, doLogout } from "../utils/User";
 
 const Home = () => {
-  const [muestrate, setMuestrate] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [logout, setLogout] = useState(false);
-
-  useEffect(() => {
-    setUserData(getUser());
-  }, [logout]);
-
-  const handleLogout = () => {
-    doLogout();
-    setLogout(true);
-  };
   return (
     <>
-      <header className="header">
-        <div className="contenedor">
-          <img src={logo} alt="" title="" className="logo" />
-          {userData && <span>{userData.user.username}</span>}
-          <span
-            className="icon-menu"
-            id="btn-menu"
-            onClick={() => setMuestrate(!muestrate)}
-          ></span>
-          <nav className={`nav ${muestrate ? "muestrate" : null}`} id="nav">
-            <ul className="menu">
-              {!userData ? (
-                <Link className="menu__item menu__link" to="/login">
-                  Login
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    to="#"
-                    className="menu__item menu__link"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Link>
-                  <Link
-                    className="menu__item menu__link"
-                    to="/establecimientos"
-                  >
-                    Establecimientos
-                  </Link>
-                </>
-              )}
-              <li className="menu__item">
-                <a className="menu__link">Hoteles</a>
-              </li>
-              <li className="menu__item">
-                <a className="menu__link">Restaurantes</a>
-              </li>
-              <li className="menu__item">
-                <a className="menu__link">Sitios Turisticos</a>
-              </li>
-              <li className="menu__item">
-                <a className="menu__link">Entretenimiento</a>
-              </li>
-              <li className="menu__item">
-                <a className="menu__link">Negocios Tradicionales</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </header>
       <div className="banner">
         <img src={banner} alt="" title="" />
         <div className="contenedor">
@@ -161,16 +93,16 @@ const Home = () => {
                 width="90%"
                 height="450"
                 style={{ border: 0 }}
-                allowfullscreen=""
+                allowFullScreen=""
                 loading="lazy"
               ></iframe>
             </div>
           </div>
         </section>
       </main>
-      <footer class="footer">
+      <footer className="footer">
         <h2>Siguenos en: </h2>
-        <div class="social">
+        <div className="social">
           <a href="https://www.facebook.com/tibasosa.boyaca.50" target="blank">
             <img src={icono1} alt="" title="" />
           </a>
@@ -184,7 +116,7 @@ const Home = () => {
             <img src={icono3} alt="" title="" />
           </a>
         </div>
-        <p class="copy">
+        <p className="copy">
           &copy; Todos los derechos reservados a TibaRismo | 2021
         </p>
       </footer>
