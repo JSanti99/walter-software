@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useEffect, useState, createContext, useMemo, useContext } from "react";
 import { useHistory } from "react-router";
+import { useNotification } from "./NotificationContext";
 const UserContext = createContext();
 
 export const UserProvider = (props) => {
   const [userData, setUserData] = useState(null);
+  const { setError, setTexto, handleOpen } = useNotification();
   const history = useHistory();
 
   useEffect(() => {
@@ -15,11 +17,21 @@ export const UserProvider = (props) => {
   const handleLogin = ({ identifier, password }) => {
     axios
       .post("http://localhost:1337/auth/local", { identifier, password })
-      .then((response) => {
-        localStorage.setItem("usuario", JSON.stringify(response.data));
-        setUserData(response.data);
-        history.push("/");
-      });
+      .then(
+        (response) => {
+          localStorage.setItem("usuario", JSON.stringify(response.data));
+          setUserData(response.data);
+          setTexto("Bienvenido!");
+          setError(false);
+          handleOpen();
+          setTimeout(() => history.push("/"), 3000);
+        },
+        (error) => {
+          setTexto("Algo ha pasado mal!");
+          setError(true);
+          handleOpen();
+        }
+      );
   };
 
   const handleLogout = () => {

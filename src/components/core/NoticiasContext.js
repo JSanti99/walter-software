@@ -2,12 +2,14 @@ import axios from "axios";
 import { useEffect, useState, createContext, useMemo, useContext } from "react";
 import { useHistory } from "react-router";
 import { endpoint } from "../../utils/endpoint";
+import { useNotification } from "./NotificationContext";
 import { useUser } from "./UserContext";
 const NoticiasContext = createContext();
 
 export const NoticiasProvider = (props) => {
   const [noticias, setNoticias] = useState(null);
   const { userData } = useUser();
+  const { setError, setTexto, handleOpen } = useNotification();
   const history = useHistory();
 
   useEffect(() => {
@@ -17,14 +19,15 @@ export const NoticiasProvider = (props) => {
   const handlePost = (data) => {
     if (userData) {
       axios
-        .post(
-          `${endpoint}/noticias`,
-          { data },
-          {
-            headers: { Authorization: `Bearer ${userData.jwt}` },
-          }
-        )
-        .then((res) => setNoticias([...noticias, res.data]));
+        .post(`${endpoint}/noticias`, data, {
+          headers: { Authorization: `Bearer ${userData.jwt}` },
+        })
+        .then((res) => {
+          setNoticias([...noticias, res.data]);
+          setTexto("Noticia creada!");
+          setError(false);
+          handleOpen();
+        });
     }
   };
   const handlePut = ({ id, data, setIsOpen }) => {
@@ -36,6 +39,9 @@ export const NoticiasProvider = (props) => {
         .then((res) => {
           setNoticias([...noticias.filter((noti) => noti.id !== id), res.data]);
           setIsOpen(false);
+          setTexto("Noticia actualizada!");
+          setError(false);
+          handleOpen();
         });
     }
   };
@@ -46,7 +52,12 @@ export const NoticiasProvider = (props) => {
         .delete(`${endpoint}/noticias/${id}`, {
           headers: { Authorization: `Bearer ${userData.jwt}` },
         })
-        .then((res) => setNoticias(noticias.filter((est) => est.id !== id)));
+        .then((res) => {
+          setNoticias(noticias.filter((est) => est.id !== id));
+          setTexto("Noticia eliminada!");
+          setError(false);
+          handleOpen();
+        });
     }
   };
 

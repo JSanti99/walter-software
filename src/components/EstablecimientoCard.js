@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Modal from "react-modal";
+import MyModal from "./MyModal";
 
 import { useUser } from "./core/UserContext";
 import EstablecimientoForm from "./EstablecimientoForm";
@@ -13,11 +14,12 @@ import { TiContacts } from "react-icons/ti";
 import { AiFillDelete } from "react-icons/ai";
 import { GrEdit } from "react-icons/gr";
 import { useEstablecimientos } from "./core/EstablecimientoContext";
+import { useNotification } from "./core/NotificationContext";
 
 const EstablecimientoCard = ({ establecimiento }) => {
   const { userData } = useUser();
   const { handleDelete } = useEstablecimientos();
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   Modal.setAppElement("#root");
 
   const calificacion = {
@@ -28,33 +30,14 @@ const EstablecimientoCard = ({ establecimiento }) => {
     cinco: "⭐⭐⭐⭐⭐",
   };
 
-  const customStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "20%",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-    },
-  };
-
   const CustomModal = () => (
-    <Modal
-      isOpen={modalIsOpen}
-      style={customStyles}
-      contentLabel="Example Modal"
-    >
+    <MyModal isOpen={isOpen} setIsOpen={setIsOpen}>
       <EstablecimientoForm
         establecimientoData={establecimiento}
         setIsOpen={setIsOpen}
       />
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button onClick={() => setIsOpen(false)}>Cancelar</Button>
-      </div>
-    </Modal>
+    </MyModal>
   );
-
   return (
     <>
       <StyledCard>
@@ -170,16 +153,6 @@ const Delete = styled.div`
   gap: 10px;
   margin-bottom: 5px;
   color: #e63946;
-`;
-
-const Button = styled.button`
-  /* Adapt the colors based on primary prop*/
-  background: #e63946;
-  color: #fff;
-  font-size: 18px;
-  padding: 0.25em 1em;
-  border: 2px solid #333;
-  border-radius: 3px;
 `;
 
 export default EstablecimientoCard;

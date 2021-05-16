@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
 
 import EstablecimientoCard from "./EstablecimientoCard";
-
-import styled from "styled-components";
 import { useEstablecimientos } from "./core/EstablecimientoContext";
+import { useNotification } from "./core/NotificationContext";
 
 const Container = styled.div`
   display: grid;
@@ -13,18 +13,28 @@ const Container = styled.div`
 
 const Establecimientos = ({ tipo }) => {
   const { establecimientos, setTipo } = useEstablecimientos();
+  const { open, handleRender } = useNotification();
+  const [notification, setNotification] = useState(null);
+
+  useEffect(() => {
+    setNotification(handleRender());
+  }, [open]);
+
   useEffect(() => setTipo(tipo));
   return (
-    <Container>
-      {establecimientos &&
-        establecimientos.length > 0 &&
-        establecimientos.map((establecimiento) => (
-          <EstablecimientoCard
-            key={establecimiento.id}
-            establecimiento={establecimiento}
-          />
-        ))}
-    </Container>
+    <>
+      {notification}
+      <Container>
+        {establecimientos &&
+          establecimientos.length > 0 &&
+          establecimientos.map((establecimiento) => (
+            <EstablecimientoCard
+              key={establecimiento.id}
+              establecimiento={establecimiento}
+            />
+          ))}
+      </Container>
+    </>
   );
 };
 

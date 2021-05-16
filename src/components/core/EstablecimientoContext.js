@@ -2,12 +2,14 @@ import axios from "axios";
 import { useEffect, useState, createContext, useMemo, useContext } from "react";
 import { useHistory } from "react-router";
 import { endpoint } from "../../utils/endpoint";
+import { useNotification } from "./NotificationContext";
 import { useUser } from "./UserContext";
 const EstablecimientoContext = createContext();
 
 export const EstablecimientoProvider = (props) => {
   const { userData } = useUser();
   const [establecimientos, setEstablecimientos] = useState(null);
+  const { setError, setTexto, handleOpen } = useNotification();
   const [tipo, setTipo] = useState(null);
   const history = useHistory();
 
@@ -27,10 +29,83 @@ export const EstablecimientoProvider = (props) => {
         .delete(`${endpoint}/establecimientos/${id}`, {
           headers: { Authorization: `Bearer ${userData.jwt}` },
         })
-        .then((res) =>
-          setEstablecimientos(establecimientos.filter((est) => est.id !== id))
+        .then(
+          (res) => {
+            setEstablecimientos(
+              establecimientos.filter((est) => est.id !== id)
+            );
+            setTexto("Establecimiento eliminado!");
+            setError(false);
+            handleOpen();
+          },
+          (error) => {
+            setTexto("Algo ha pasado mal!");
+            setError(true);
+            handleOpen();
+          }
         );
     }
+  };
+
+  const handlePost = (formFoto, data) => {
+    if (userData) {
+      axios
+        .post("http://localhost:1337/upload", formFoto, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${userData.jwt}`,
+          },
+        })
+        .then((foto) => {
+          axios
+            .post(
+              "http://localhost:1337/establecimientos",
+              {
+                ...data,
+                fotos: foto.data,
+              },
+              { headers: { Authorization: `Bearer ${userData.jwt}` } }
+            )
+            .then((establecimiento) => {
+              setTexto("Establecimiento creado!");
+              setError(true);
+              handleOpen();
+            });
+        });
+    }
+  };
+
+  const handlePut = (formFoto, establecimientoData, data, setIsOpen) => {
+    axios
+      .post("http://localhost:1337/upload", formFoto, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${userData.jwt}`,
+        },
+      })
+      .then((foto) => {
+        axios
+          .put(
+            `http://localhost:1337/establecimientos/${establecimientoData.id}`,
+            {
+              ...data,
+              fotos: foto.data,
+            },
+            { headers: { Authorization: `Bearer ${userData.jwt}` } }
+          )
+          .then((establecimiento) => {
+            setEstablecimientos([
+              ...establecimientos.filter(
+                (est) => est.id !== establecimiento.data.id
+              ),
+              establecimiento.data,
+            ]);
+            setTexto("Establecimiento actualizado!");
+            setError(false);
+            handleOpen();
+            setIsOpen(false);
+          });
+      });
   };
 
   const value = useMemo(
@@ -39,6 +114,8 @@ export const EstablecimientoProvider = (props) => {
       setEstablecimientos,
       tipo,
       setTipo,
+      handlePost,
+      handlePut,
       handleDelete,
     }),
     [establecimientos, tipo, setTipo]

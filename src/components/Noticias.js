@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { useNoticias } from "./core/NoticiasContext";
+import { useNotification } from "./core/NotificationContext";
 import NoticiaCard from "./NoticiaCard";
 
 const Container = styled.div`
@@ -12,13 +13,22 @@ const Container = styled.div`
 
 const Noticias = () => {
   const { noticias } = useNoticias();
+  const { open, handleRender } = useNotification();
+  const [notification, setNotification] = useState(null);
+  useEffect(() => {
+    setNotification(handleRender());
+  }, [open]);
+
   return (
-    <Container>
-      {noticias &&
-        noticias.map((noticia) => (
-          <NoticiaCard key={noticia.id} noticia={noticia} />
-        ))}
-    </Container>
+    <>
+      {notification}
+      <Container>
+        {noticias &&
+          noticias.map((noticia) => (
+            <NoticiaCard key={noticia.id} noticia={noticia} />
+          ))}
+      </Container>
+    </>
   );
 };
 

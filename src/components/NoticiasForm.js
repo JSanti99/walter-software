@@ -1,13 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
 import { useNoticias } from "./core/NoticiasContext";
+import { useNotification } from "./core/NotificationContext";
 import { useUser } from "./core/UserContext";
 
 const NoticiasForm = ({ noticiaData, setIsOpen }) => {
   const { userData } = useUser();
   const { handlePost, handlePut } = useNoticias();
+  const { open, handleRender } = useNotification();
+  const [notification, setNotification] = useState(null);
 
   const {
     register,
@@ -30,25 +33,33 @@ const NoticiasForm = ({ noticiaData, setIsOpen }) => {
     if (!userData.jwt) return;
 
     if (!noticiaData) {
-      handlePost();
+      handlePost(data);
     } else {
       handlePut({ id: noticiaData.id, data, setIsOpen });
     }
   };
+
+  useEffect(() => {
+    setNotification(handleRender());
+  }, [open]);
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <Section>
-        <Label htmlFor="title">Titulo</Label>
-        <Input id="title" {...register("title")}></Input>
-      </Section>
-      <Section>
-        <Label htmlFor="description">Descripcion</Label>
-        <Input id="description" {...register("descripcion")}></Input>
-      </Section>
-      <Section className="">
-        <Button type="submit">Crear</Button>
-      </Section>
-    </Form>
+    <>
+      {notification}
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Section>
+          <Label htmlFor="title">Titulo</Label>
+          <Input id="title" {...register("title")}></Input>
+        </Section>
+        <Section>
+          <Label htmlFor="description">Descripcion</Label>
+          <Input id="description" {...register("descripcion")}></Input>
+        </Section>
+        <Section className="">
+          <Button type="submit">Crear</Button>
+        </Section>
+      </Form>
+    </>
   );
 };
 const colorPrincipal = "#96bb7c";
@@ -57,7 +68,7 @@ const colorSecundario = "#252525";
 const Form = styled.form`
   display: grid;
   grid-template-columns: 1fr;
-  width: 50%;
+  padding: 10px;
   margin: auto;
   gap: 10px;
 `;

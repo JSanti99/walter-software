@@ -2,7 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import dayjs from "dayjs";
 
-import Modal from "react-modal";
+import MyModal from "./MyModal";
 
 import { materialShadow } from "./shadows";
 import { useNoticias } from "./core/NoticiasContext";
@@ -15,31 +15,12 @@ import NoticiasForm from "./NoticiasForm";
 const NoticiaCard = ({ noticia }) => {
   const { userData } = useUser();
   const { noticias, handleDelete } = useNoticias();
-  const [modalIsOpen, setIsOpen] = useState(false);
-  Modal.setAppElement("#root");
-
-  const customStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "20%",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-    },
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   const CustomModal = () => (
-    <Modal
-      isOpen={modalIsOpen}
-      style={customStyles}
-      contentLabel="Example Modal"
-    >
+    <MyModal isOpen={isOpen} setIsOpen={setIsOpen}>
       <NoticiasForm noticiaData={noticia} setIsOpen={setIsOpen} />
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button onClick={() => setIsOpen(false)}>Cancelar</Button>
-      </div>
-    </Modal>
+    </MyModal>
   );
 
   return (

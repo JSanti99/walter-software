@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
 import { useEstablecimientos } from "./core/EstablecimientoContext";
 import { useUser } from "./core/UserContext";
+import { useNotification } from "./core/NotificationContext";
 
 const EstablecimientoForm = ({ establecimientoData, setIsOpen }) => {
   const { userData } = useUser();
-  const { establecimientos, setEstablecimientos } = useEstablecimientos();
+  const { handlePost, handlePut } = useEstablecimientos();
+  const [notification, setNotification] = useState(null);
+  const { open, handleRender } = useNotification();
   const {
     register,
     handleSubmit,
@@ -39,126 +41,93 @@ const EstablecimientoForm = ({ establecimientoData, setIsOpen }) => {
     let formData = new FormData();
     formData.append("files", data.fotos[0]);
     if (!establecimientoData) {
-      axios
-        .post("http://localhost:1337/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${userData.jwt}`,
-          },
-        })
-        .then((foto) => {
-          axios
-            .post(
-              "http://localhost:1337/establecimientos",
-              {
-                ...data,
-                fotos: foto.data,
-              },
-              { headers: { Authorization: `Bearer ${userData.jwt}` } }
-            )
-            .then((establecimiento) => console.log({ establecimiento }));
-        });
+      handlePost(formData, data);
     } else {
-      axios
-        .post("http://localhost:1337/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${userData.jwt}`,
-          },
-        })
-        .then((foto) => {
-          axios
-            .put(
-              `http://localhost:1337/establecimientos/${establecimientoData.id}`,
-              {
-                ...data,
-                fotos: foto.data,
-              },
-              { headers: { Authorization: `Bearer ${userData.jwt}` } }
-            )
-            .then((establecimiento) => {
-              setEstablecimientos([
-                ...establecimientos.filter(
-                  (est) => est.id !== establecimiento.data.id
-                ),
-                establecimiento.data,
-              ]);
-              setIsOpen(false);
-            });
-        });
+      handlePut(formData, establecimientoData, data, setIsOpen);
     }
   };
-  return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <Section>
-        <Label htmlFor="matricula">Matricula</Label>
-        <Input id="matricula" type="number" {...register("matricula")}></Input>
-      </Section>
-      <Section>
-        <Label htmlFor="nombre">Nombre</Label>
-        <Input id="nombre" {...register("nombre")}></Input>
-      </Section>
-      <Section className="">
-        <Label htmlFor="ubicacion">Ubicacion</Label>
-        <Input id="ubicacion" {...register("ubicacion")}></Input>
-      </Section>
-      <Section className="">
-        <Label htmlFor="descripcion">Descripcion</Label>
-        <Input id="descripcion" {...register("descripcion")}></Input>
-      </Section>
-      <Section className="">
-        <Label htmlFor="infoContacto">Info de Contacto</Label>
-        <Input id="infoContacto" {...register("infoContacto")}></Input>
-      </Section>
-      <Section className="">
-        <Label htmlFor="tipoEstablecimiento">Tipo Establecimiento</Label>
-        <Select
-          id="tipoEstablecimiento"
-          defaultValue="bar"
-          {...register("tipoEstablecimiento")}
-        >
-          {[
-            "turistico",
-            "hotel",
-            "restaurante",
-            "entretenimiento",
-            "tradicional",
-          ].map((val) => (
-            <option key={val} value={val}>
-              {val}
-            </option>
-          ))}
-        </Select>
-      </Section>
 
-      <Section className="">
-        <Label htmlFor="calificacion">Calificacion</Label>
-        <Select
-          id="calificacion"
-          defaultValue={"uno"}
-          {...register("calificacion")}
-        >
-          {[
-            { label: "⭐", val: "uno" },
-            { label: "⭐⭐", val: "dos" },
-            { label: "⭐⭐⭐", val: "tres" },
-            { label: "⭐⭐⭐⭐", val: "cuatro" },
-            { label: "⭐⭐⭐⭐⭐", val: "cinco" },
-          ].map(({ label, val }) => (
-            <option key={val} value={val}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </Section>
-      <Section className="">
-        <Label htmlFor="fotos">Fotos</Label>
-        <Input type="file" {...register("fotos")}></Input>
-      </Section>
-      <Section className="">
-        <Button type="submit">Crear</Button>
-      </Section>
-    </Form>
+  useEffect(() => {
+    setNotification(handleRender());
+  }, [open]);
+  return (
+    <>
+      {notification}
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Section>
+          <Label htmlFor="matricula">Matricula</Label>
+          <Input
+            id="matricula"
+            type="number"
+            {...register("matricula")}
+          ></Input>
+        </Section>
+        <Section>
+          <Label htmlFor="nombre">Nombre</Label>
+          <Input id="nombre" {...register("nombre")}></Input>
+        </Section>
+        <Section className="">
+          <Label htmlFor="ubicacion">Ubicacion</Label>
+          <Input id="ubicacion" {...register("ubicacion")}></Input>
+        </Section>
+        <Section className="">
+          <Label htmlFor="descripcion">Descripcion</Label>
+          <Input id="descripcion" {...register("descripcion")}></Input>
+        </Section>
+        <Section className="">
+          <Label htmlFor="infoContacto">Info de Contacto</Label>
+          <Input id="infoContacto" {...register("infoContacto")}></Input>
+        </Section>
+        <Section className="">
+          <Label htmlFor="tipoEstablecimiento">Tipo Establecimiento</Label>
+          <Select
+            id="tipoEstablecimiento"
+            defaultValue="bar"
+            {...register("tipoEstablecimiento")}
+          >
+            {[
+              "turistico",
+              "hotel",
+              "restaurante",
+              "entretenimiento",
+              "tradicional",
+            ].map((val) => (
+              <option key={val} value={val}>
+                {val}
+              </option>
+            ))}
+          </Select>
+        </Section>
+
+        <Section className="">
+          <Label htmlFor="calificacion">Calificacion</Label>
+          <Select
+            id="calificacion"
+            defaultValue={"uno"}
+            {...register("calificacion")}
+          >
+            {[
+              { label: "⭐", val: "uno" },
+              { label: "⭐⭐", val: "dos" },
+              { label: "⭐⭐⭐", val: "tres" },
+              { label: "⭐⭐⭐⭐", val: "cuatro" },
+              { label: "⭐⭐⭐⭐⭐", val: "cinco" },
+            ].map(({ label, val }) => (
+              <option key={val} value={val}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </Section>
+        <Section className="">
+          <Label htmlFor="fotos">Fotos</Label>
+          <Input type="file" {...register("fotos")}></Input>
+        </Section>
+        <Section className="">
+          <Button type="submit">Crear</Button>
+        </Section>
+      </Form>
+    </>
   );
 };
 
@@ -168,9 +137,10 @@ const colorSecundario = "#252525";
 const Form = styled.form`
   display: grid;
   grid-template-columns: 1fr;
-  width: 50%;
+  padding: 10px;
   margin: auto;
   gap: 10px;
+  margin-bottom: auto;
 `;
 
 const Section = styled.div`
