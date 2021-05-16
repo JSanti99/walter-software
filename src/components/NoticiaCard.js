@@ -1,32 +1,22 @@
 import { useState } from "react";
 import styled from "styled-components";
+import dayjs from "dayjs";
+
 import Modal from "react-modal";
 
-import { useUser } from "./core/UserContext";
-import EstablecimientoForm from "./EstablecimientoForm";
-
-import defaultImg from "../utils/img/banner.jpg";
-import { endpoint } from "../utils/endpoint";
 import { materialShadow } from "./shadows";
-import { FaMapMarkerAlt } from "react-icons/fa";
-import { TiContacts } from "react-icons/ti";
-import { AiFillDelete } from "react-icons/ai";
-import { GrEdit } from "react-icons/gr";
-import { useEstablecimientos } from "./core/EstablecimientoContext";
+import { useNoticias } from "./core/NoticiasContext";
+import { useUser } from "./core/UserContext";
 
-const EstablecimientoCard = ({ establecimiento }) => {
+import { AiFillDelete } from "react-icons/ai";
+import { GrEdit, GrClock } from "react-icons/gr";
+import NoticiasForm from "./NoticiasForm";
+
+const NoticiaCard = ({ noticia }) => {
   const { userData } = useUser();
-  const { handleDelete } = useEstablecimientos();
+  const { noticias, handleDelete } = useNoticias();
   const [modalIsOpen, setIsOpen] = useState(false);
   Modal.setAppElement("#root");
-
-  const calificacion = {
-    uno: "⭐",
-    dos: "⭐⭐",
-    tres: "⭐⭐⭐",
-    cuatro: "⭐⭐⭐⭐",
-    cinco: "⭐⭐⭐⭐⭐",
-  };
 
   const customStyles = {
     content: {
@@ -45,10 +35,7 @@ const EstablecimientoCard = ({ establecimiento }) => {
       style={customStyles}
       contentLabel="Example Modal"
     >
-      <EstablecimientoForm
-        establecimientoData={establecimiento}
-        setIsOpen={setIsOpen}
-      />
+      <NoticiasForm noticiaData={noticia} setIsOpen={setIsOpen} />
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <Button onClick={() => setIsOpen(false)}>Cancelar</Button>
       </div>
@@ -61,37 +48,22 @@ const EstablecimientoCard = ({ establecimiento }) => {
         {userData && (
           <Delete>
             <GrEdit onClick={() => setIsOpen(true)} size={28} />
-            <AiFillDelete
-              onClick={() => handleDelete(establecimiento.id)}
-              size={28}
-            />
+            <AiFillDelete onClick={() => handleDelete(noticia.id)} size={28} />
           </Delete>
         )}
-        <img
-          alt=""
-          src={
-            establecimiento.fotos && establecimiento.fotos.length > 0
-              ? `${endpoint}${establecimiento.fotos[0].url}`
-              : defaultImg
-          }
-        />
         <header>
-          <h1>{establecimiento.nombre}</h1>
+          <h1>{noticia.title}</h1>
         </header>
         <section>
-          <p>{establecimiento.descripcion}</p>
+          <p>{noticia.descripcion}</p>
         </section>
         <footer>
           <div id="info">
             <p>
-              <FaMapMarkerAlt size={20} />
-              <small>{establecimiento.ubicacion}</small>
+              <GrClock size={20} />
+              <small> {dayjs(noticia.updated_at).format("YYYY-MM-DD")}</small>
             </p>
-            <a href={establecimiento.infoContacto}>
-              <TiContacts size={25} />
-            </a>
           </div>
-          <div>{calificacion[establecimiento.calificacion]}</div>
         </footer>
       </StyledCard>
       <CustomModal />
@@ -110,7 +82,7 @@ const StyledCard = styled.article`
   ${materialShadow.base}
 
   h1 {
-    margin-bottom: 0;
+    margin-bottom: 1rem;
   }
   img {
     width: 100%;
@@ -182,4 +154,4 @@ const Button = styled.button`
   border-radius: 3px;
 `;
 
-export default EstablecimientoCard;
+export default NoticiaCard;

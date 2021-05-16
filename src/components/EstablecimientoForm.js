@@ -1,6 +1,9 @@
+import { useEffect } from "react";
+
 import axios from "axios";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import styled from "styled-components";
+
 import { useEstablecimientos } from "./core/EstablecimientoContext";
 import { useUser } from "./core/UserContext";
 
@@ -86,58 +89,137 @@ const EstablecimientoForm = ({ establecimientoData, setIsOpen }) => {
     }
   };
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <label htmlFor="matricula">matricula</label>
-      <input id="matricula" type="number" {...register("matricula")}></input>
-      <label htmlFor="nombre">nombre</label>
-      <input id="nombre" {...register("nombre")}></input>
-      <label htmlFor="ubicacion">ubicacion</label>
-      <input id="ubicacion" {...register("ubicacion")}></input>
-      <label htmlFor="descripcion">descripcion</label>
-      <input id="descripcion" {...register("descripcion")}></input>
-      <label htmlFor="infoContacto">infoContacto</label>
-      <input id="infoContacto" {...register("infoContacto")}></input>
-      <label htmlFor="tipoEstablecimiento">tipoEstablecimiento</label>
-      <select
-        id="tipoEstablecimiento"
-        defaultValue="bar"
-        {...register("tipoEstablecimiento")}
-      >
-        {[
-          "turistico",
-          "hotel",
-          "restaurante",
-          "entretenimiento",
-          "tradicional",
-        ].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="calificacion">Calificacion</label>
-      <select
-        id="calificacion"
-        defaultValue={"uno"}
-        {...register("calificacion")}
-      >
-        {[
-          { label: "⭐", val: "uno" },
-          { label: "⭐⭐", val: "dos" },
-          { label: "⭐⭐⭐", val: "tres" },
-          { label: "⭐⭐⭐⭐", val: "cuatro" },
-          { label: "⭐⭐⭐⭐⭐", val: "cinco" },
-        ].map(({ label, val }) => (
-          <option key={val} value={val}>
-            {label}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="fotos">Fotos</label>
-      <input type="file" {...register("fotos")}></input>
-      <button type="submit">Crear</button>
-    </form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <Section>
+        <Label htmlFor="matricula">Matricula</Label>
+        <Input id="matricula" type="number" {...register("matricula")}></Input>
+      </Section>
+      <Section>
+        <Label htmlFor="nombre">Nombre</Label>
+        <Input id="nombre" {...register("nombre")}></Input>
+      </Section>
+      <Section className="">
+        <Label htmlFor="ubicacion">Ubicacion</Label>
+        <Input id="ubicacion" {...register("ubicacion")}></Input>
+      </Section>
+      <Section className="">
+        <Label htmlFor="descripcion">Descripcion</Label>
+        <Input id="descripcion" {...register("descripcion")}></Input>
+      </Section>
+      <Section className="">
+        <Label htmlFor="infoContacto">Info de Contacto</Label>
+        <Input id="infoContacto" {...register("infoContacto")}></Input>
+      </Section>
+      <Section className="">
+        <Label htmlFor="tipoEstablecimiento">Tipo Establecimiento</Label>
+        <Select
+          id="tipoEstablecimiento"
+          defaultValue="bar"
+          {...register("tipoEstablecimiento")}
+        >
+          {[
+            "turistico",
+            "hotel",
+            "restaurante",
+            "entretenimiento",
+            "tradicional",
+          ].map((val) => (
+            <option key={val} value={val}>
+              {val}
+            </option>
+          ))}
+        </Select>
+      </Section>
+
+      <Section className="">
+        <Label htmlFor="calificacion">Calificacion</Label>
+        <Select
+          id="calificacion"
+          defaultValue={"uno"}
+          {...register("calificacion")}
+        >
+          {[
+            { label: "⭐", val: "uno" },
+            { label: "⭐⭐", val: "dos" },
+            { label: "⭐⭐⭐", val: "tres" },
+            { label: "⭐⭐⭐⭐", val: "cuatro" },
+            { label: "⭐⭐⭐⭐⭐", val: "cinco" },
+          ].map(({ label, val }) => (
+            <option key={val} value={val}>
+              {label}
+            </option>
+          ))}
+        </Select>
+      </Section>
+      <Section className="">
+        <Label htmlFor="fotos">Fotos</Label>
+        <Input type="file" {...register("fotos")}></Input>
+      </Section>
+      <Section className="">
+        <Button type="submit">Crear</Button>
+      </Section>
+    </Form>
   );
 };
+
+const colorPrincipal = "#96bb7c";
+const colorSecundario = "#252525";
+
+const Form = styled.form`
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 50%;
+  margin: auto;
+  gap: 10px;
+`;
+
+const Section = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+`;
+
+const Label = styled.label`
+  font-size: 18px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: ${colorSecundario};
+  font-weight: bold;
+`;
+
+const Input = styled.input`
+  font-size: 18px;
+  padding: 10px;
+  background: ${colorPrincipal};
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  :focus {
+    outline: none;
+  }
+`;
+
+const Select = styled.select`
+  font-size: 18px;
+  padding: 10px;
+  background: ${colorPrincipal};
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  :focus {
+    outline: none;
+  }
+`;
+
+const Button = styled.button`
+  /* Adapt the colors based on primary prop*/
+  background: ${colorPrincipal};
+  color: #fff;
+  font-size: 18px;
+  padding: 0.25em 1em;
+  border: 2px solid ${colorSecundario};
+  border-radius: 3px;
+  &:hover {
+    cursor: pointer;
+  }
+`;
 
 export default EstablecimientoForm;

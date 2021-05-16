@@ -50,7 +50,6 @@ body {
   left: -100%;
   width: 100%;
   transition: all 0.5s;
-  z-index: 100;
 }
 .menu {
   list-style: none;
@@ -73,6 +72,10 @@ body {
 }
 .muestrate {
   left: 0;
+}
+.selected {
+  background: #333;
+  color: #fff;
 }
 
 /*-------Estilos del Banner-----*/
